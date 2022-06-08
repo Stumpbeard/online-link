@@ -1,7 +1,8 @@
-[gd_scene load_steps=7 format=2]
+[gd_scene load_steps=12 format=2]
 
 [ext_resource path="res://pixel_font.tres" type="DynamicFont" id=1]
 [ext_resource path="res://NameScreen.gd" type="Script" id=2]
+[ext_resource path="res://sheet.png" type="Texture" id=3]
 
 [sub_resource type="StyleBoxEmpty" id=2]
 
@@ -11,14 +12,40 @@
 
 [sub_resource type="StyleBoxEmpty" id=4]
 
+[sub_resource type="RectangleShape2D" id=5]
+extents = Vector2( 4, 4 )
+
+[sub_resource type="AtlasTexture" id=7]
+atlas = ExtResource( 3 )
+region = Rect2( 40, 8, 8, 8 )
+
+[sub_resource type="AtlasTexture" id=6]
+atlas = ExtResource( 3 )
+region = Rect2( 32, 8, 8, 8 )
+
+[sub_resource type="SpriteFrames" id=8]
+animations = [ {
+"frames": [ SubResource( 7 ) ],
+"loop": true,
+"name": "pressed",
+"speed": 5.0
+}, {
+"frames": [ SubResource( 6 ) ],
+"loop": true,
+"name": "default",
+"speed": 5.0
+} ]
+
 [node name="NameScreen" type="Control"]
 margin_right = 128.0
 margin_bottom = 112.0
+mouse_filter = 2
 script = ExtResource( 2 )
 
 [node name="ColorRect" type="ColorRect" parent="."]
 margin_right = 128.0
 margin_bottom = 112.0
+mouse_filter = 2
 color = Color( 0, 0, 0, 1 )
 
 [node name="Label" type="Label" parent="."]
@@ -29,10 +56,11 @@ text = "Name thineself:"
 
 [node name="TextEdit" type="TextEdit" parent="."]
 margin_left = 8.0
-margin_top = 16.0
+margin_top = 18.0
 margin_right = 68.0
-margin_bottom = 48.0
+margin_bottom = 50.0
 custom_colors/caret_color = Color( 1, 1, 1, 1 )
+custom_colors/font_color = Color( 1, 1, 1, 1 )
 custom_fonts/font = ExtResource( 1 )
 custom_styles/read_only = SubResource( 2 )
 custom_styles/focus = SubResource( 3 )
@@ -40,4 +68,38 @@ custom_styles/normal = SubResource( 1 )
 custom_styles/completion = SubResource( 4 )
 text = "Lonk"
 
+[node name="ToggleButton" type="Area2D" parent="."]
+position = Vector2( 120, 104 )
+z_index = 1
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="ToggleButton"]
+z_index = 4
+shape = SubResource( 5 )
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="AnimatedSprite" type="AnimatedSprite" parent="ToggleButton"]
+frames = SubResource( 8 )
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="IPInput" type="TextEdit" parent="ToggleButton"]
+visible = false
+margin_left = -118.0
+margin_top = -22.0
+margin_right = -4.0
+margin_bottom = 10.0
+custom_colors/caret_color = Color( 1, 1, 1, 1 )
+custom_colors/font_color = Color( 1, 1, 1, 1 )
+custom_fonts/font = ExtResource( 1 )
+custom_styles/read_only = SubResource( 2 )
+custom_styles/focus = SubResource( 3 )
+custom_styles/normal = SubResource( 1 )
+custom_styles/completion = SubResource( 4 )
+text = "0.0.0.0"
+
 [connection signal="text_changed" from="TextEdit" to="." method="_on_TextEdit_text_changed"]
+[connection signal="input_event" from="ToggleButton" to="." method="_on_ToggleButton_input_event"]
+[connection signal="text_changed" from="ToggleButton/IPInput" to="." method="_on_TextEdit_text_changed"]

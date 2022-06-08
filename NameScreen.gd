@@ -4,6 +4,8 @@ extends Control
 # Declare member variables here. Examples:
 # var a = 2
 # var b = "text"
+var button_pressed = false
+var button_hovered = false
 
 
 # Called when the node enters the scene tree for the first time.
@@ -24,8 +26,17 @@ func _on_TextEdit_text_changed():
 func _input(event):
 	if event is InputEventKey:
 		if event.pressed and event.scancode == KEY_ENTER:
-			var game = load('res://Game.tscn').instance()
-			game.change_name($TextEdit.text)
-			get_parent().add_child(game)
+			get_parent().start_game($TextEdit.text)
 			get_tree().set_input_as_handled()
 			queue_free()
+
+func _on_ToggleButton_input_event(viewport, event, shape_idx):
+	if event is InputEventMouseButton:
+		if event.pressed:
+			button_pressed = !button_pressed
+			if button_pressed:
+				$ToggleButton/AnimatedSprite.play("pressed")
+				$ToggleButton/IPInput.visible = true
+			else:
+				$ToggleButton/AnimatedSprite.play("default")
+				$ToggleButton/IPInput.visible = false
