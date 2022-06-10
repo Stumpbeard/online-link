@@ -55,6 +55,7 @@ func start_game(player_name):
 	if !$NameScreen.button_pressed:
 		start_server()
 	else:
+		SERVER_IP = $NameScreen/ToggleButton/IPInput.text
 		start_client()
 	var game = load('res://Game.tscn').instance()
 	game.change_name(player_name)

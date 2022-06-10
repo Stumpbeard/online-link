@@ -15,24 +15,24 @@
 [sub_resource type="RectangleShape2D" id=5]
 extents = Vector2( 4, 4 )
 
-[sub_resource type="AtlasTexture" id=7]
-atlas = ExtResource( 3 )
-region = Rect2( 40, 8, 8, 8 )
-
 [sub_resource type="AtlasTexture" id=6]
 atlas = ExtResource( 3 )
 region = Rect2( 32, 8, 8, 8 )
 
+[sub_resource type="AtlasTexture" id=7]
+atlas = ExtResource( 3 )
+region = Rect2( 40, 8, 8, 8 )
+
 [sub_resource type="SpriteFrames" id=8]
 animations = [ {
-"frames": [ SubResource( 7 ) ],
-"loop": true,
-"name": "pressed",
-"speed": 5.0
-}, {
 "frames": [ SubResource( 6 ) ],
 "loop": true,
 "name": "default",
+"speed": 5.0
+}, {
+"frames": [ SubResource( 7 ) ],
+"loop": true,
+"name": "pressed",
 "speed": 5.0
 } ]
 
@@ -98,7 +98,7 @@ custom_styles/read_only = SubResource( 2 )
 custom_styles/focus = SubResource( 3 )
 custom_styles/normal = SubResource( 1 )
 custom_styles/completion = SubResource( 4 )
-text = "0.0.0.0"
+text = "localhost"
 
 [connection signal="text_changed" from="TextEdit" to="." method="_on_TextEdit_text_changed"]
 [connection signal="input_event" from="ToggleButton" to="." method="_on_ToggleButton_input_event"]
