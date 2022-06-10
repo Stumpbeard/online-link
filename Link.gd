@@ -22,16 +22,31 @@ func _physics_process(delta):
 	if dead:
 		return
 	var move = Vector2()
-	if !attacking:
-		if Input.is_action_pressed("ui_left"):
-			move.x -= 1
-		if Input.is_action_pressed("ui_right"):
-			move.x += 1
-		if Input.is_action_pressed("ui_up"):
-			move.y -= 1
-		if Input.is_action_pressed("ui_down"):
-			move.y += 1
+	if str(get_tree().get_network_unique_id()) == get_name():
+		if !attacking:
+			if Input.is_action_pressed("ui_left"):
+				move.x -= 1
+			if Input.is_action_pressed("ui_right"):
+				move.x += 1
+			if Input.is_action_pressed("ui_up"):
+				move.y -= 1
+			if Input.is_action_pressed("ui_down"):
+				move.y += 1
+			if Input.is_key_pressed(KEY_Z):
+				rpc('attack')
 
+	rpc('move_character', move)
+			
+remotesync func move_character(move_data):
+	var move = Vector2(move_data)
+	if move.x < 0:
+		direction = 'left'
+	if move.x > 0:
+		direction = 'right'
+	if move.y < 0:
+		direction = 'up'
+	if move.y > 0:
+		direction = 'down'
 	move = move.normalized()
 	move_and_slide(move * speed)
 	if move.x < 0:
@@ -48,24 +63,8 @@ func _physics_process(delta):
 		var collider = get_slide_collision(0).collider
 		if collider.has_method('is_enemy') and collider.is_enemy():
 			die()
-		
-func _input(event):
-	if dead:
-		return
-	if event is InputEventKey:
-		if event.pressed and event.scancode == KEY_RIGHT:
-			direction = 'right'
-		elif event.pressed and event.scancode == KEY_LEFT:
-			direction = 'left'
-		elif event.pressed and event.scancode == KEY_UP:
-			direction = 'up'
-		elif event.pressed and event.scancode == KEY_DOWN:
-			direction = 'down'
 			
-		if !attacking and Input.is_action_just_pressed("ui_accept"):
-			attack()
-			
-func attack():
+remotesync func attack():
 	match direction:
 		'right':
 			$sword.rotation_degrees = 0
@@ -85,8 +84,26 @@ func attack():
 	$sword.monitoring = false
 	attacking = false
 	
-func die():
+remotesync func die():
 	dead = true
 	$AnimatedSprite.play("cloud")
 	yield(get_tree().create_timer(1), "timeout")
-	queue_free()
+	visible = false
+	$CollisionShape2D.disabled = true
+	
+
+func serialize():
+	return {
+		"position": position,
+		"animation": $AnimatedSprite.animation,
+		"direction": direction,
+		"attacking": attacking,
+		"dead": dead
+	}
+	
+func deserialize(data):
+	position = Vector2(data["position"])
+	$AnimatedSprite.play(data["animation"])
+	direction = data["direction"]
+	attacking = data["attacking"]
+	dead = data["dead"]

@@ -13,7 +13,8 @@ func _ready():
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
-	var bodies = get_overlapping_bodies()
-	if bodies:
-		if bodies[0].has_method('is_enemy') and bodies[0].is_enemy():
-			bodies[0].die()
+	if monitoring:
+		var bodies = get_overlapping_bodies()
+		if bodies:
+			if bodies[0].has_method('is_enemy') and bodies[0].is_enemy():
+				bodies[0].die()
