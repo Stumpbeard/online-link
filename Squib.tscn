@@ -11,13 +11,13 @@ region = Rect2( 48, 0, 8, 8 )
 atlas = ExtResource( 1 )
 region = Rect2( 56, 0, 8, 8 )
 
-[sub_resource type="AtlasTexture" id=10]
-atlas = ExtResource( 1 )
-region = Rect2( 0, 8, 8, 8 )
-
 [sub_resource type="AtlasTexture" id=12]
 atlas = ExtResource( 1 )
 region = Rect2( 24, 8, 8, 8 )
+
+[sub_resource type="AtlasTexture" id=10]
+atlas = ExtResource( 1 )
+region = Rect2( 0, 8, 8, 8 )
 
 [sub_resource type="SpriteFrames" id=6]
 animations = [ {
@@ -26,14 +26,14 @@ animations = [ {
 "name": "walk",
 "speed": 5.0
 }, {
-"frames": [ SubResource( 10 ) ],
-"loop": true,
-"name": "default",
-"speed": 5.0
-}, {
 "frames": [ SubResource( 12 ) ],
 "loop": true,
 "name": "cloud",
+"speed": 5.0
+}, {
+"frames": [ SubResource( 10 ) ],
+"loop": true,
+"name": "default",
 "speed": 5.0
 } ]
 
@@ -60,5 +60,6 @@ __meta__ = {
 }
 
 [node name="DecisionTimer" type="Timer" parent="."]
+one_shot = true
 
 [connection signal="timeout" from="DecisionTimer" to="." method="_on_DecisionTimer_timeout"]

@@ -75,14 +75,16 @@ margin_bottom = 14.0
 custom_fonts/font = ExtResource( 4 )
 text = "Link"
 
-[node name="Squib" parent="." instance=ExtResource( 5 )]
+[node name="Enemies" type="Node" parent="."]
+
+[node name="Squib" parent="Enemies" instance=ExtResource( 5 )]
 position = Vector2( 60, 60 )
 
-[node name="Squib2" parent="." instance=ExtResource( 5 )]
+[node name="Squib2" parent="Enemies" instance=ExtResource( 5 )]
 position = Vector2( 52, 84 )
 
-[node name="Squib3" parent="." instance=ExtResource( 5 )]
+[node name="Squib3" parent="Enemies" instance=ExtResource( 5 )]
 position = Vector2( 20, 76 )
 
-[node name="Squib4" parent="." instance=ExtResource( 5 )]
+[node name="Squib4" parent="Enemies" instance=ExtResource( 5 )]
 position = Vector2( 108, 68 )

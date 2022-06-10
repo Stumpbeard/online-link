@@ -6,7 +6,6 @@ extends KinematicBody2D
 # var b = "text"
 var speed = 16
 var direction = 'right'
-var attacking = false
 var moving = false
 var roll = 0
 var spawning = false
@@ -24,12 +23,24 @@ func _ready():
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _physics_process(delta):
+	if !is_network_master():
+		return
 	if spawning or dead:
 		return
-	if !moving and !attacking:
+	if !moving:
 		roll = randi() % 6
+		
+
+	rpc('handle_roll', roll)
+	
+remotesync func handle_roll(local_roll):
+	if dead:
+		return
+	roll = local_roll
+	if $DecisionTimer.is_stopped():
 		$DecisionTimer.start(2)
 		moving = true
+
 	var move = Vector2()
 	if roll == 0:
 		move.x -= 1
@@ -46,6 +57,7 @@ func _physics_process(delta):
 		
 	if roll == 5:
 		var rock = load("res://Rock.tscn").instance()
+		moving = true
 		rock.position = position
 		match direction:
 			'right':
@@ -57,7 +69,7 @@ func _physics_process(delta):
 			'up':
 				rock.dir = Vector2(0, -1)
 		roll = 4
-		get_parent().add_child(rock)
+		get_parent().get_parent().add_child(rock)
 
 	move = move.normalized()
 	move_and_slide(move * speed)
@@ -79,55 +91,41 @@ func _physics_process(delta):
 		var col = get_slide_collision(0)
 		position += col.normal
 		roll = 4
-		
-func _input(event):
-	return
-	if event is InputEventKey:
-		if event.pressed and event.scancode == KEY_RIGHT:
-			direction = 'right'
-		elif event.pressed and event.scancode == KEY_LEFT:
-			direction = 'left'
-		elif event.pressed and event.scancode == KEY_UP:
-			direction = 'up'
-		elif event.pressed and event.scancode == KEY_DOWN:
-			direction = 'down'
-			
-		if !attacking and Input.is_action_just_pressed("ui_accept"):
-			attack()
-			
-func attack():
-	return
-	match direction:
-		'right':
-			$sword.rotation_degrees = 0
-		'left':
-			$sword.rotation_degrees = 180
-		'down':
-			$sword.rotation_degrees = 90
-		'up':
-			$sword.rotation_degrees = 270
-	$sword.visible = true
-	$sword.monitorable = true
-	attacking = true
-	yield(get_tree().create_timer(0.5), "timeout")
-	$sword.visible = false
-	$sword.monitorable = false
-	attacking = false
-
 
 func _on_DecisionTimer_timeout():
 	moving = false
-	attacking = false
-	roll = 4
 
 func is_enemy():
 	return true and !(spawning or dead)
 	
-func die():
+func handle_death():
+	rpc('die')
+	
+remotesync func die():
 	if spawning:
 		return
 	dead = true
 	$CollisionShape2D.disabled = true
 	$AnimatedSprite.play("cloud")
 	yield(get_tree().create_timer(1), "timeout")
-	queue_free()
+	visible = false
+
+
+func serialize():
+	return {
+		"position": position,
+		"spawning": spawning,
+		"moving": moving,
+		"dead": dead,
+		"direction": direction
+	}
+
+func deserialize(data):
+	position = Vector2(data["position"])
+	spawning = data["spawning"]
+	moving = data["moving"]
+	dead = data["dead"]
+	direction = data["direction"]
+	if dead:
+		visible = false
+		$CollisionShape2D.disabled = true

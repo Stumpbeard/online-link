@@ -62,7 +62,7 @@ remotesync func move_character(move_data):
 	if collisions:
 		var collider = get_slide_collision(0).collider
 		if collider.has_method('is_enemy') and collider.is_enemy():
-			die()
+			handle_death()
 			
 remotesync func attack():
 	match direction:
@@ -83,6 +83,9 @@ remotesync func attack():
 	$sword.monitorable = false
 	$sword.monitoring = false
 	attacking = false
+	
+func handle_death():
+	rpc('die')
 	
 remotesync func die():
 	dead = true
@@ -107,3 +110,6 @@ func deserialize(data):
 	direction = data["direction"]
 	attacking = data["attacking"]
 	dead = data["dead"]
+	if dead:
+		visible = false
+		$CollisionShape2D.disabled = true

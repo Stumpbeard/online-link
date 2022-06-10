@@ -21,7 +21,7 @@ func _physics_process(delta):
 	move_and_slide(dir * speed)
 	if get_slide_count():
 		var collision = get_slide_collision(0)
-		collision.collider.die()
+		collision.collider.handle_death()
 		queue_free()
 		
 	

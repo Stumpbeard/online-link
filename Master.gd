@@ -25,6 +25,7 @@ func start_server():
 	var peer = NetworkedMultiplayerENet.new()
 	peer.create_server(SERVER_PORT, MAX_PLAYERS)
 	get_tree().network_peer = peer
+	$Timer.start(3)
 	
 func start_client():
 	print("started client")
@@ -47,6 +48,7 @@ func _player_connected(id):
 		get_node("Game").add_child(player)
 		player_info[str(id)] = player
 		sync_players()
+		sync_enemies()
 
 
 func start_game(player_name):
@@ -62,12 +64,27 @@ func sync_players():
 	for id in player_info:
 		rpc('upsert_player', id, player_info[id].serialize())
 		
+func sync_enemies():
+	for enemy in get_node("Game/Enemies").get_children():
+		rpc('upsert_enemy', enemy.get_name(), enemy.serialize())
+		
+		
 remote func upsert_player(id, player):
-	print("attempting to upsert id ", id)
-	print(player)
 	var game = get_node("Game")
 	if !game.get_node(id):
 		var new_player = load("res://Link.tscn").instance()
 		new_player.set_name(id)
 		new_player.deserialize(player)
 		game.add_child(new_player)
+	else:
+		game.get_node(id).deserialize(player)
+		
+remote func upsert_enemy(id, enemy_data):
+	var game = get_node("Game")
+	var enemy = game.get_node("Enemies/%s" % id)
+	enemy.deserialize(enemy_data)
+
+
+func _on_Timer_timeout():
+	sync_players()
+	sync_enemies()
